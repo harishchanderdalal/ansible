@@ -23,13 +23,7 @@ ansbile all -i inventory -u vagrant -m ping -k
 ```
 ansbile 10.0.0.20 -i inventory -u vagrant -m ping -k -v
 ```
-#### connection using SSH
-#### Compile Ping module
-#### Make Directory change permission
-#### echo ansible and know details
-#### put module that compile Directory
-#### python binary excute module
-#### Remove in last that module
+- Process Work
 
 1. connection using SSH
 2. Compile Ping module
