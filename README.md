@@ -50,5 +50,9 @@ sudo yum install ansible -y
 ## VAGRANT DB COMPILE
 ```
 vagrant ssh db
-sudo  -y
+sudo yum install gcc -y
+sudo yum install python-setuptools -y
+sudo easy_install pip -y
+sudo yum install python-devel -y
+sudo pip install ansible -y
 ```
