@@ -1,13 +1,13 @@
-## Ansible
+# Ansible
 - Start
-#### Create file with inventory
+
+### Create file with inventory
 ```
 10.0.0.20
 10.0.0.30
 ```
 
-### Test Connection with Inventory HOST
-
+## Test Connection with Inventory HOST
 ```
 ansbile all -i inventory -u vagrant -m ping -k
 
@@ -36,3 +36,9 @@ ansbile 10.0.0.20 -i inventory -u vagrant -m ping -k -v
 5. put module that compile Directory
 6. python binary excute module
 7. Remove in last that module
+
+## AD HOC
+```
+ansbile all -i inventory -u vagrant -m command -a "/usr/sbin/reboot"
+ansbile all -i inventory -u vagrant -m command -a "/usr/sbin/ yum update -y"
+```
