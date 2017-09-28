@@ -1,9 +1,6 @@
 # ansible
 
 ## VAGRANT
-1 - ansible
-2 - webserver
-3 - DB
 
 - vagrant file
 ```
