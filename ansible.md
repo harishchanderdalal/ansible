@@ -15,3 +15,8 @@ ansbile all -i inventory -u vagrant -m ping -k
 -m = module
 -k = password
 ```
+
+- debug mode
+```
+ansbile 10.0.0.20 -i inventory -u vagrant -m ping -k -v
+```
