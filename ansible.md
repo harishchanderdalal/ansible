@@ -10,18 +10,20 @@
 
 ```
 ansbile all -i inventory -u vagrant -m ping -k
-```
 
-- Parameter Use in CMD:
+
+Parameter Use in CMD:
 * -i = variable (Inventory File Name)
 * -u = username
 * -m = module
 * -k = password
+```
 
 - debug mode
 1. v 1st level
 2. vv 2nd level
 3. vvvv 3rd level
+
 ```
 ansbile 10.0.0.20 -i inventory -u vagrant -m ping -k -v
 ```
