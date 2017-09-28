@@ -17,6 +17,9 @@ ansbile all -i inventory -u vagrant -m ping -k
 ```
 
 - debug mode
+#### v 1st level
+#### vv 2nd level
+#### vvvv 3rd level
 ```
 ansbile 10.0.0.20 -i inventory -u vagrant -m ping -k -v
 ```
