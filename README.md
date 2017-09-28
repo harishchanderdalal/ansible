@@ -33,3 +33,22 @@ end
 vagrant up
 vboxmanage list runningvms
 ```
+
+## VAGRANT ANSBILE - UBUNTU
+```
+vagrant ssh ansible
+sudo apt-get install ansible -y
+```
+
+## VAGRANT WEB - CENTOS
+```
+sudo ssh web
+sudo yum install epel-release -y
+sudo yum install ansible -y
+```
+
+## VAGRANT DB COMPILE
+```
+vagrant ssh db
+sudo  -y
+```
