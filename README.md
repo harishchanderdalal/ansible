@@ -27,3 +27,9 @@ Vagrant.configure(2) do |config|
 
 end
 ```
+
+- VAGRANT RUN AND TEST
+```
+vagrant up
+vboxmanage list runningvms
+```
