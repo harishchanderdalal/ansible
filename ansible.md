@@ -58,6 +58,10 @@ web1
 [dbservers]
 db1
 
+[datacenter:children]
+webservers
+dbservers
+
 [datacenter:vars]
 ansible_ssh_user=vagrant
 ansible_ssh_pass=vagrant
