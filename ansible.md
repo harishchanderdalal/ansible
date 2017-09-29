@@ -42,3 +42,20 @@ ansbile 10.0.0.20 -i inventory -u vagrant -m ping -k -v
 ansbile all -i inventory -u vagrant -m command -a "/usr/sbin/reboot"
 ansbile all -i inventory -u vagrant -m command -a "/usr/sbin/ yum update -y"
 ```
+
+## Ansbile Inventory Example 1
+- inventory
+```
+web1 ansible_ssh_host=10.0.0.20
+db1 ansible_ssh_host=10.0.0.30
+
+[webservers]
+web1
+
+[dbservers]
+db1
+
+[datacenter:vars]
+ansible_ssh_user=vagrant
+ansible_ssh_pass=vagrant
+```
