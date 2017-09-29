@@ -72,4 +72,4 @@ ansible_ssh_pass=vagrant
 ```
 
 ## Inventory Manage
-![inventory](https://user-images.githubusercontent.com/22466745/31009694-03d531fa-a526-11e7-84d0-6ff7b88b9ce8.PNG)
+![env inventory](https://user-images.githubusercontent.com/22466745/31010986-5caedad4-a52a-11e7-8c47-71b005652b0c.PNG)
