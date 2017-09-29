@@ -44,6 +44,9 @@ ansbile all -i inventory -u vagrant -m command -a "/usr/sbin/ yum update -y"
 ```
 
 ## Ansbile Inventory Example 1
+```
+ansible datacenter -i inventory -m ping
+```
 - inventory
 ```
 web1 ansible_ssh_host=10.0.0.20
