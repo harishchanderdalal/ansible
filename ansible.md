@@ -1,5 +1,9 @@
 # Ansible
-- Start
+- What Is ansible
+![what_is_ansible](https://user-images.githubusercontent.com/22466745/31009645-d9c434a6-a525-11e7-8351-091d10752f5a.PNG)
+
+- How ansible work
+![ansible_works](https://user-images.githubusercontent.com/22466745/31009780-3f096908-a526-11e7-948b-1ec211939974.PNG)
 
 ### Create file with inventory
 ```
@@ -66,3 +70,6 @@ dbservers
 ansible_ssh_user=vagrant
 ansible_ssh_pass=vagrant
 ```
+
+## Inventory Manage
+![inventory](https://user-images.githubusercontent.com/22466745/31009694-03d531fa-a526-11e7-84d0-6ff7b88b9ce8.PNG)
