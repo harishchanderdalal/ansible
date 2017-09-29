@@ -73,3 +73,8 @@ ansible_ssh_pass=vagrant
 
 ## Inventory Manage
 ![env inventory](https://user-images.githubusercontent.com/22466745/31010986-5caedad4-a52a-11e7-8c47-71b005652b0c.PNG)
+
+- Priority
+1. (Host_Vars) Hostname
+2. (Group_vars) GroupName
+3. (Group_Vars) All
