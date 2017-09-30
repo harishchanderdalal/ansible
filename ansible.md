@@ -43,7 +43,56 @@ ansbile all -i inventory -u vagrant -m command -a "/usr/sbin/reboot"
 ansbile all -i inventory -u vagrant -m command -a "/usr/sbin/ yum update -y"
 ```
 
-## Ansbile Inventory Example 1
+## Ansbile Inventory 
+- Global Variable ALL With Keygen
+```
+ansible datacenter -i inventory -m ping
+```
+- inventory
+```
+web1 ansible_ssh_host=10.0.0.20
+db1 ansible_ssh_host=10.0.0.30
+
+[webservers]
+web1
+
+[dbservers]
+db1
+
+[datacenter:children]
+webservers
+dbservers
+
+[all:vars]
+ansible_ssh_user=vagrant
+ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
+```
+
+- Global Variable ALL with Plan Text UserName Password
+```
+ansible datacenter -i inventory -m ping
+```
+- inventory
+```
+web1 ansible_ssh_host=10.0.0.20
+db1 ansible_ssh_host=10.0.0.30
+
+[webservers]
+web1
+
+[dbservers]
+db1
+
+[datacenter:children]
+webservers
+dbservers
+
+[all:vars]
+ansible_ssh_user=vagrant
+ansible_ssh_pass=vagrant
+```
+
+- Global Variable with Group
 ```
 ansible datacenter -i inventory -m ping
 ```
@@ -66,6 +115,7 @@ dbservers
 ansible_ssh_user=vagrant
 ansible_ssh_pass=vagrant
 ```
+
 
 ## Inventory Manage
 ![env inventory](https://user-images.githubusercontent.com/22466745/31010986-5caedad4-a52a-11e7-8c47-71b005652b0c.PNG)
