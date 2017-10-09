@@ -55,7 +55,7 @@ sudo yum install python-devel -y
 sudo pip install ansible -y
 ```
 
-## VAGRANT DB COMPILE CENTOS
+## VAGRANT DB COMPILE Ubuntu
 ```
 sudo apt-get update
 sudo apt-get install -y software-properties-common
