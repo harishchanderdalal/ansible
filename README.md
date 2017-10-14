@@ -13,5 +13,5 @@
 
 ## Roles Structure
 ```
-mkdir -p project && touch production staging site.yml ansible.cfg && mkdir -p group_vars host_vars library filter_plugins && mkdir -p roles/common/{tasks,handlers,templates,files,vars,defaults,meta} && touch roles/common/{tasks,handlers,templates,files,vars,defaults,meta}/main.yml
+mkdir -p project && touch production staging site.yml ansible.cfg && mkdir -p group_vars host_vars && mkdir -p roles/common/{tasks,handlers,templates,files,vars,defaults,meta} && touch roles/common/{tasks,handlers,templates,files,vars,defaults,meta}/main.yml
 ```
