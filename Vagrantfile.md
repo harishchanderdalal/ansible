@@ -69,8 +69,7 @@ sudo -H pip install ansible==2.1.1.0
 sudo yum update
 sudo yum install python-pip python-wheel python-devel
 sudo yum install gcc libffi-devel
-sudo yum install cryptography
-sudo pip install ansible=2.1.1.0
+sudo pip install ansible==2.1.1.0
 ansible --version
 ```
 
