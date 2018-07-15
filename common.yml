@@ -1,0 +1,5 @@
+---
+# file: bash.yml
+- hosts: dev  
+  roles:
+    - common

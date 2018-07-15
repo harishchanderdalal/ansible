@@ -1,0 +1,10 @@
+---
+- name: Hello
+  shell: "echo hello"
+  tags:
+    - hello
+
+- name: Bye
+  shell: "echo bye"
+  tags:
+    - bye
