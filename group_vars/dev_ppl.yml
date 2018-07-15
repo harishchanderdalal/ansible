@@ -1,0 +1,43 @@
+---
+# defaults file for Dev_ppl application
+
+APP: '{{ app_name }}'
+JAVA_LOC_ORIG: '/usr/jdk/instances/jre1.7.0_151'
+env_full_fillment: 'DEV-Development'
+PROCESS_NAME: sendmail
+APP_PROGRAM_FILE: '/usr/lib/sendmail'
+svn_trunk_url: 'https://github.com/mngk/zip_file/raw/master'
+
+#Application file and directory description
+HOME: '/local/apps/ppl'
+APP_HOME: '{{ HOME }}/{{ APP }}'
+DIST_DIR: '{{ APP_HOME }}/dist'
+DEPLOY_DIR: '{{ APP_HOME }}/deploy'
+LOG_DIR: '/tmp/ansible_app_logs'
+BUILD_CONFIRMATION_FILE: '{{ DEPLOY_DIR }}/bin/BUILD'
+APP_LOG_FILE: '{{ LOG_DIR }}/{{ APP }}'
+#APP_PROGRAM_FILE: '{{ APP_HOME }}/bin/{{ APP }}.jar'
+
+#User details
+APP_OWNER: 'ppl'
+APP_GROUP: 'ppl'
+
+#Extra vars description
+java_loc_orig: '{{ JAVA_LOC_ORIG }}'
+var_file_name: 'dump_all_vars_dev_ppl.txt'
+java_loc: '{{ APP_HOME }}/java'
+
+#Email description
+email_attachment_success_log: "{{ LOG_DIR }}/{{ APP }}/Success_Log_{{ APP }}_{{ new_build }}_{{ deploy_start_time }}_{{ env_full_fillment }}_{{ ansible_hostname }}.log"
+email_subject_success: "Deployment Log for {{ APP }} on {{ env_full_fillment }} "
+email_body_success: "Deployment completed for {{APP}} on {{ env_full_fillment }}, Log file : {{ email_attachment_success_log }}"
+DIST_LIST_success: 'example@example.com'
+
+email_attachment_failed_log: "{{ LOG_DIR }}/{{ APP }}/Failed_Log_{{ APP }}_{{ deploy_start_time }}_{{ env_full_fillment }}_{{ansible_hostname}}.log"
+email_subject_failed: "Deployment Failure Log for {{APP}} on {{ env_full_fillment }} "
+email_body_failed: "Deployment failed for {{APP}} on {{ env_full_fillment }}, Log file : {{ email_attachment_failed_log }}"
+DIST_LIST_failed: 'example@example.com'
+
+#Ports Details
+MAIL_PORT: 25
+APP_PORT: 25

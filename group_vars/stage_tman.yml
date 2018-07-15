@@ -1,0 +1,41 @@
+---
+# defaults file for Stage_PPL application
+
+APP: '{{ app_name }}'
+JAVA_LOC_ORIG: '/usr/jdk/instances/jre1.6.0_151'
+env_full_fillment: 'STAGE'
+PROCESS_NAME: sendmail
+APP_PROGRAM_FILE: '/usr/lib/sendmail'
+svn_trunk_url: 'https://github.com/mngk/zip_file/raw/master'
+APP_PORT: 25
+
+#Application file and directory description
+HOME: '/local/apps/tman_stage'
+APP_HOME: '{{ HOME }}/{{ APP }}'
+DIST_DIR: '{{ APP_HOME }}/dist'
+DEPLOY_DIR: '{{ APP_HOME }}/deploy'
+LOG_DIR: '/tmp/ansible_app_logs'
+BUILD_CONFIRMATION_FILE: '{{ DEPLOY_DIR }}/bin/build_file.txt'
+APP_LOG_FILE: '{{ LOG_DIR }}/{{ APP }}'
+#APP_PROGRAM_FILE: '{{ APP_HOME }}/bin/{{ APP }}.jar'
+
+#User details
+APP_OWNER: 'tman'
+APP_GROUP: 'tman'
+
+#Extra vars description
+java_loc_orig: '{{ JAVA_LOC_ORIG }}'
+var_file_name: 'dump_all_vars_stage_tman.txt'
+
+#Email description
+email_attachment_success: "{{ LOG_DIR }}/{{ APP }}/Success_Log_{{ APP }}_{{ new_build }}_{{ deploy_start_time }}.log"
+email_subject_success: "Deployment Log for {{APP}}"
+email_body_success: "Deployment completed for {{APP}} on {{ env_full_fillment }}, Log file : {{ LOG_DIR }}/{{ APP }}/Success_Log_{{ APP }}_{{ new_build }}_{{ deploy_start_time }}.log"
+DIST_LIST_success: 'jibinjose087@gmail.com'
+
+email_attachment_failed: "{{ LOG_DIR }}/{{ APP }}/Failed_Log_{{ APP }}_{{ deploy_start_time }}.log"
+email_subject_failed: "Deployment Failure Log for {{APP}}"
+email_body_failed: "Deployment failed for {{APP}} on {{ env_full_fillment }}, Log file : {{ LOG_DIR }}/{{ APP }}/Failed_Log_{{ APP }}_{{ deploy_start_time }}.log"
+DIST_LIST_failed: 'jibinjose087@gmail.com'
+
+MAIL_PORT: 25

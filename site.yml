@@ -1,3 +1,3 @@
 ---
-# file: site.yml
-- import_playbook: common.yml
+
+- include: deploy.yml

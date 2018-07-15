@@ -1,0 +1,300 @@
+---
+# tasks file for deployment
+- block:
+    - name: nullify the ansible log file before the execuition of playbook
+      local_action:
+        module: shell
+        args:
+          "> {{ log_file_ansible }}"
+
+    - debug:
+        msg: "**************** The deployment started for {{ APP }} application on  {{ env_full_fillment }} environment on {{ ansible_date_time.date }}_{{ ansible_date_time.time }} ****************"
+
+    - name: Registering the deployment started time to append on log file
+      set_fact:
+        deploy_start_time: "{{ ansible_date_time.date }}_{{ ansible_date_time.time }}"
+
+    - name: Registering the result of deployment folder verification
+      stat:
+        path: "{{ APP_HOME }}"
+      register: deployment_folder_stat
+
+    - name: debug
+      debug:
+        msg:
+          - "Application Name - {{ APP }}"
+          - "Environment - {{env_full_fillment}}"
+          - "Application Owner - {{ APP_OWNER }}"
+          - "Application group - {{ APP_GROUP }}"
+          - "Process Name - {{ PROCESS_NAME }}"
+          - "Application Home Path - {{APP_HOME}}"
+          - "Application Program File - {{APP_PROGRAM_FILE}}"
+          - "Deployment Directory - {{DEPLOY_DIR}}"
+          - "Java Location - {{ java_loc_orig }}"
+          - "Log Location - {{ LOG_DIR }}"
+          - "Build File for deployment - {{ SVN_SOURCE }}"
+
+    - name: Stop the execution if deployment folder is not present
+      fail:
+        msg: File not found!! Please check the deployment folder '{{ APP_HOME }}'
+      when: "deployment_folder_stat.stat.exists == False"
+
+    - name: Checking the war file status on artifactory
+      uri:
+        url: "{{ SVN_SOURCE }}"
+        status_code: 200,201,202
+        validate_certs: no
+
+    - name: Create a svn export directory {{ SVN_EXPORT_DIR }}
+      file:
+        dest: "{{ SVN_EXPORT_DIR }}"
+        owner: "{{ APP_OWNER }}"
+        group: "{{ APP_GROUP }}"
+        state: directory
+
+    - name: Downloading the deployment files from artifactory or git repository
+      get_url:
+        url: '{{ SVN_SOURCE }}'
+        dest: '{{ SVN_EXPORT_DIR }}'
+        mode: 0777
+        validate_certs: no
+
+    - name: select the build number from zip file downloaded
+      shell: ls '{{ SVN_EXPORT_DIR }}/{{ BUILD_FILE }}' | awk -F "BUILD_" '{print $2}' | awk -F "." '{print $1}'
+      register: build_num
+
+    - name: getting build number from zip file name
+      set_fact:
+        new_build: '{{ build }}_{{ build_num.stdout }}'
+
+    - name: Create a temp deployment directory {{ TEMP_DEPLOY_DIR }}
+      file:
+        dest: "{{ TEMP_DEPLOY_DIR }}"
+        state: directory
+
+    - name: Extract the zip file to tmp folder to get Build details
+      unarchive:
+        src: "{{ SVN_EXPORT_DIR }}/{{ BUILD_FILE }}"
+        dest: "{{ TEMP_DEPLOY_DIR }}"
+        remote_src: yes
+        owner: "{{ APP_OWNER }}"
+        group: "{{ APP_GROUP }}"
+
+    - name: getting build number from text file
+      slurp:
+        src: "{{ TEMP_DEPLOY_CONFIRMATION_FILE }}"
+      register: slurp_buildnumber
+
+    - debug: msg="{{ slurp_buildnumber['content'] | b64decode }}"
+      register: war_build
+
+    - name: comparing the zip file build number and the one available in the text file
+      debug:
+        msg: The build is same {{ war_build.msg }} and {{ build }}_{{ build_num.stdout }}
+      when: war_build.msg == new_build
+
+    - name: comparing the zip file build number and the one available in the text file when both are different
+      debug:
+        msg: The build is not same {{ war_build.msg }} and {{ build }}_{{ build_num.stdout }}
+      when: war_build.msg != new_build
+
+    - name: Delete temp deployment directory {{ TEMP_DEPLOY_DIR }}
+      file:
+        dest: "{{ TEMP_DEPLOY_DIR }}"
+        state: absent
+
+    - name: Stop the execution if the build numbers are different
+      fail:
+        msg: Build number is different!! exiting the deployment cycle'
+      when: war_build.msg != new_build    
+
+    - name: Registering the pid of the process for further processing
+      shell: fuser {{ APP_PROGRAM_FILE }} 2> /dev/null | awk '{ print $1 }'
+      register: app_process_id
+      ignore_errors: True
+
+    - name: Creating a new file to store the process id of application
+      file:
+        path: '{{ SVN_EXPORT_DIR }}/{{ build }}_{{ build_num.stdout }}'
+        state: touch
+
+    - name: Storing the process id to the file for future reference                                                                                 
+      lineinfile:                                                                                           
+        destfile: "{{ SVN_EXPORT_DIR }}/{{ build }}_{{ build_num.stdout }}"
+        line: "{{ app_process_id.stdout }}"
+        remote_src: yes
+      when: app_process_id.stdout != ""
+
+    #- name: Stopping the app {{APP}} through UAT Autosys
+    #  command: sendevent -E FORCE_STARTJOB -J test_server
+
+    - name: stopping the {{PROCESS_NAME}} service
+      service: name={{PROCESS_NAME}} state=stopped
+
+    - name: Cross checking the pid of the process again for killing the process id
+      shell: fuser {{ APP_PROGRAM_FILE }} 2> /dev/null | awk '{ print $1 }'
+      register: app_process_id_cross_check
+      ignore_errors: True
+
+    - name: Kill the running processes related to {{ PROCESS_NAME }}
+      shell: "kill {{ app_process_id_cross_check.stdout }}"
+      when: "app_process_id_cross_check.stdout | int != 0"
+
+    - name: verifying the {{PROCESS_NAME}} stopped status by checking the port binding status
+      wait_for:
+        host: "127.0.0.1"
+        port: "{{ app_port }}"
+        state: stopped
+        delay: 2
+        timeout: 60
+
+    - name: verifying the {{ PROCESS_NAME }} stopped status through process id checking
+      shell: ps -ef | grep {{ PROCESS_NAME }} | grep -v grep | wc -l
+      register: app_process_status
+
+    - name: removing the deployed folder for further deployment
+      file:
+        path: '{{ DEPLOY_DIR }}'
+        state: absent
+      when: "app_process_status.stdout|int == 0"
+
+    - name: extract the tar file to the deployment location
+      unarchive:
+        src: "{{ SVN_EXPORT_DIR }}/{{ BUILD_FILE }}"
+        dest: "{{ APP_HOME }}"
+        remote_src: yes
+        owner: "{{ APP_OWNER }}"
+        group: "{{ APP_GROUP }}"
+      when: "app_process_status.stdout|int == 0"
+
+    - name: changing the permission and ownership of entire deployment folder
+      file:
+        path: "{{ APP_HOME }}/"
+        owner: "{{ APP_OWNER }}"
+        group: "{{ APP_GROUP }}"
+        recurse: yes
+        mode: 0755
+      when: "app_process_status.stdout|int == 0"
+
+    - name: removing the java symlink from deployment folder
+      file:
+        path: "{{ java_loc }}"
+        state: absent
+      when: war_build.msg == new_build
+
+    - name: create java symlink again
+      file:
+        src: "{{ java_loc_orig }}"
+        dest: "{{ java_loc }}"
+        owner: "{{ APP_OWNER }}"
+        group: "{{ APP_GROUP }}"
+        state: link
+      when: war_build.msg == new_build
+
+    - name: starting the {{PROCESS_NAME}} service after deployment
+      service: name={{ PROCESS_NAME }} state=started
+
+    - name: verifying the {{ PROCESS_NAME }} startup status by checking the port binding status and waiting 30 seconds
+      wait_for:
+        host: "127.0.0.1"
+        port: "{{ app_port }}"
+        state: started
+        delay: 2
+        timeout: 60
+
+    - name: checking the {{ PROCESS_NAME }} status
+      shell: ps -ef | grep {{ PROCESS_NAME }} | grep -v grep | wc -l
+      register: app_process_status_final
+
+    - name: Verifying {{ PROCESS_NAME }} running status
+      shell: fuser {{ APP_PROGRAM_FILE }} 2> /dev/null | awk '{ print $1 }'
+      register: app_process_id_fuser
+      ignore_errors: True
+
+    - debug:
+        msg: "The deployment completed successfully and {{ PROCESS_NAME }} started"
+      when: "app_process_status_final.stdout| int != 0 and app_process_id_fuser.stdout != 0" 
+
+    - debug:
+        msg: "The deployment seems to be failure and {{ PROCESS_NAME }} not started"
+      when: "app_process_status_final.stdout| int == 0"
+
+    - name: delete the file created for storing the process id
+      file:
+        path: "{{ SVN_EXPORT_DIR }}/{{ build }}_{{ build_num.stdout }}"
+        state: absent
+
+    - name: Dump all vars for future reference
+      template:
+        src: "variables_list.txt.j2"
+        dest: "{{ SVN_EXPORT_DIR }}/{{ var_file_name }}"
+        owner: "{{ APP_OWNER }}"
+        group: "{{ APP_GROUP }}"
+        mode: 0644
+
+    - name: regsitering all the dum variables to another variable for displaying on screen.
+      shell: "cat {{ SVN_EXPORT_DIR }}/{{ var_file_name }}"
+      register: dump_vars_list
+
+    - debug: msg="{{ dump_vars_list.stdout_lines }}"
+
+    - debug: msg="The deployment completed for {{ APP }} application on {{ ansible_date_time.date }}_{{ ansible_date_time.time }}"
+
+    - name: Renaming log file to {{ APP }}_{{ new_build }}_{{ ansible_date_time.date }}_{{ ansible_date_time.time }}
+      local_action:
+        module: copy
+        args:
+          src: "{{ log_file_ansible }}"
+    #      dest: "{{ LOG_DIR }}/{{ APP }}/Success_Log_{{ APP }}_{{ new_build }}_{{ deploy_start_time }}.log"
+          dest: "{{ email_attachment_success_log }}"
+
+    #- name: Sending deployment success mail to application ditribuiton list
+    #  mail:
+    #    host: "127.0.0.1"
+    #    port: "{{ mail_port }}"
+    #    subject: "{{ email_subject_success }}"
+    #    body: '{{ email_body_success }}'
+    #    from: "{{ DIST_LIST_success }}"
+    #    to: "{{ DIST_LIST_success }}"
+    #    cc: "{{ DIST_LIST_success }}"
+    #    attach: "{{ email_attachment_success_log }}"
+        #attach: "{{ log_file_ansible }}"
+    #    charset: utf8
+    #  delegate_to: localhost
+
+    - debug: msg="The deployment completed for {{ APP }} application and email sent successfully"
+
+    - name: Delete temp directory {{ TEMP_DIR }}
+      file:
+        dest: "{{ TEMP_DIR }}"
+        state: absent
+
+  rescue:
+    - debug: msg="The deployment seems to be incompleted in one of the steps please check the log files for more info"
+
+    - name: Renaming log file to "{{ APP }}_{{ deploy_start_time }}".log incase of failure
+      local_action:
+        module: copy
+        args:
+          src: "{{ log_file_ansible }}"
+    #      dest: "{{ LOG_DIR }}/{{ APP }}/Failed_Log_{{ APP }}_{{ deploy_start_time }}.log"
+          dest: "{{ email_attachment_failed_log }}"
+
+    #- name: Sending Failure mail to application ditribuiton list 
+    #  mail:
+    #    host: "127.0.0.1"
+    #    port: "{{ mail_port }}"
+    #    subject: "{{ email_subject_failed }}"
+    #    body: '{{ email_body_failed }}'
+    #    from: "{{ DIST_LIST_failed }}"
+    #    to: "{{ DIST_LIST_failed }}"
+    #    cc: "{{ DIST_LIST_failed }}"
+    #    attach: "{{ email_attachment_failed_log }}"
+        #attach: "{{ log_file_ansible }}"
+    #    charset: utf8
+    #  delegate_to: localhost
+
+    - name: Delete temp directory {{ TEMP_DIR }}
+      file:
+        dest: "{{ TEMP_DIR }}"
+        state: absent

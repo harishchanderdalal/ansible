@@ -1,0 +1,14 @@
+---
+- hosts: localhost
+  remote_user: root
+  roles:
+    - webserver
+
+- name: Verifying {{ PROCESS_NAME }} is running on {{ host_ip_app }}
+  shell: fuser {{ jar_file_name }} 2> /dev/null | awk '{ print $1 }'
+  register: app_process_id_fuser
+  ignore_errors: True
+
+
+- name: Kill the running processes related to {{ PROCESS_NAME }}
+  shell: "kill {{ item }}"
