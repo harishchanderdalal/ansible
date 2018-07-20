@@ -10,7 +10,8 @@
   - name: ping all hosts
     ping:
 
-  - local_action: command date '+%F-%H%M'
+ - name: Create Release Time Stamp
+    local_action: command date '+%F-%H%M'
     register: release_timestamp
 
   - name: Git Checkout Frontend Repo
