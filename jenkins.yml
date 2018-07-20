@@ -10,10 +10,13 @@
   - name: ping all hosts
     ping:
 
+  - local_action: command date '+%F_%T'
+    register: release_timestamp
+
   - name: Git Checkout Frontend Repo
     git:
       repo: https://github.com/harishchanderdalal/ansible.git
-      dest: "{{JOB_PATH}}/frontend"
+      dest: "{{JOB_PATH}}/-{{release_timestamp.stdout}}"
 
       refspec: '+refs/pull/*:refs/heads/*'
       version: master
