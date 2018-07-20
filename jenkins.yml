@@ -20,7 +20,9 @@
       refspec: '+refs/pull/*:refs/heads/*'
       version: master
 
-  - debug: msg="{{Git Checkout Frontend Repo}}"
+  - name: Print debug message
+    debug:
+      msg: Hello, world!
 
   - name: Build Frontend Deploy
     shell: |
