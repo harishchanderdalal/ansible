@@ -10,18 +10,10 @@
   - name: ping all hosts
     ping:
 
-  - name: Jenkins Default Path
-    command: echo "$PATH"
-    register: default_path
-
-  - name: Jenkins WorkSpace
-    command: echo "$WORKSPACE"
-    register: jenkins_job_workspace
-
   - name: Git Checkout Frontend Repo
     git:
       repo: https://github.com/harishchanderdalal/ansible.git
-      dest: {{ JOB_PATH }}/BUILD
+      dest: "{{ JOB_PATH }}"/BUILD
       refspec: '+refs/pull/*:refs/heads/*'
       version: master
 
