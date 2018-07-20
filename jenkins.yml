@@ -28,4 +28,4 @@
   - name: Create Build Tar
     archive:
       path: "{{JOB_PATH}}/CHECKOUT{{release_timestamp.stdout}}"
-      format: zip
+      dest: "{{JOB_PATH}}/CHECKOUT{{release_timestamp.stdout}}.tar.gz"
