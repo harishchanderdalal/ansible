@@ -1,0 +1,29 @@
+---
+- hosts: localhost
+  user: node
+  vars:
+    custom_ssh_port: 33000
+
+  tasks:
+  - name: ping all hosts
+    ping:
+
+  - name: Jenkins Default Path
+    command: echo "$PATH"
+    register: default_path
+
+  - name: Jenkins WorkSpace
+    command: echo "$WORKSPACE"
+    register: jenkins_job_workspace
+
+  - name: Git Checkout Frontend Repo
+    git:
+      repo: https://github.com/harishchanderdalal/ansible.git
+      dest: "{{ jenkins_job_workspace }}"
+      refspec: '+refs/pull/*:refs/heads/*'
+      version: "{{ CHECKOUT }}"
+
+  - name: Build Frontend Deploy
+    shell: |
+      echo "Building PayUmoney Front End"
+      exit 0
