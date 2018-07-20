@@ -1,8 +1,10 @@
 ---
+
 - hosts: localhost
   user: node
   vars:
     custom_ssh_port: 33000
+    JOB_PATH: "{{ WORKSPACE }}"
 
   tasks:
   - name: ping all hosts
@@ -19,7 +21,7 @@
   - name: Git Checkout Frontend Repo
     git:
       repo: https://github.com/harishchanderdalal/ansible.git
-      dest: /var/lib/jenkins/workspace/Ansible/repo
+      dest: {{ JOB_PATH }}/BUILD
       refspec: '+refs/pull/*:refs/heads/*'
       version: master
 
