@@ -13,7 +13,7 @@
   - name: Git Checkout Frontend Repo
     git:
       repo: https://github.com/harishchanderdalal/ansible.git
-      dest: "{{ JOB_PATH }}"/BUILD
+      dest: "{{ JOB_PATH }}"
       refspec: '+refs/pull/*:refs/heads/*'
       version: master
 
